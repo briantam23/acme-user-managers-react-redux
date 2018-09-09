@@ -33,11 +33,7 @@ app.post('/api/users', (req, res, next) => {
 
 app.put('/api/users/:id', (req, res, next) => {
     User.findById(req.params.id)
-        .then(user => {
-            if(!user) res.sendStatus(404);
-            Object.assign(user, req.body);
-            user.save();
-        })
+        .then(user => user.update(req.body))
         .then(user => res.send(user))
         .catch(next)
 })

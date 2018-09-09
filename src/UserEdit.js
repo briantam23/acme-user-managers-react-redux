@@ -2,17 +2,17 @@ import React, { Component } from 'react';
 import store, { changeName } from './store';
 
 export default class extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = store.getState();
-        this.onCreate = this.onCreate.bind(this);
+        this.onUpdate = this.onUpdate.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
     componentDidMount() { this.unsubscribe = store.subscribe(() => this.setState(store.getState())); }
     componentWillUnmount() { this.unsubscribe(); }
-    onCreate(ev) {
+    onUpdate(ev) {
         ev.preventDefault();
-        this.props.createUser({ name: this.state.name })
+        this.props.updateUser({ id: this.props.id, name: this.state.name})
             .then(() => this.props.history.push('/users'));
     }
     handleChange(ev) {
@@ -20,11 +20,11 @@ export default class extends Component {
     }
     render() {
         const { name } = this.state;
-        const { onCreate, handleChange } = this;
+        const { onUpdate, handleChange } = this;
         return (
-            <form onSubmit={ onCreate }>
-                <input value={ name } onChange={ handleChange }></input>
-                <button disabled={ !name }>Create</button>
+            <form onSubmit={ onUpdate }>
+                <input value={ name} onChange={ handleChange }></input>
+                <button disabled={ !name }>Update</button>
             </form>
         )
     }
