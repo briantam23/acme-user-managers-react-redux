@@ -21,9 +21,18 @@ export default class extends Component {
     render() {
         const { name } = this.state;
         const { onUpdate, handleChange } = this;
+        const { users } = this.props;
         return (
             <form onSubmit={ onUpdate }>
                 <input value={ name} onChange={ handleChange }></input>
+                <select>
+                    <option value=''>--none--</option>
+                {
+                    users.map(user => <option key={ user.id } value={ user.id }>
+                        { user.name }
+                    </option>)
+                }
+                </select>
                 <button disabled={ !name }>Update</button>
             </form>
         )
