@@ -1,13 +1,12 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 
-export default ({ users, destroyUser }) => {
+export default ({ users, destroyTodo }) => {
     return (
         <ul>
         {
-            users.map(user => <li key={ user.id }><Link to={`/users/${user.id}`}>
-                { user.name }</Link>
-                <button onClick={ () => destroyUser(user) }>X</button>
+            users.map(user => <li key={ user.id }>
+                { user.name }
+                <button onClick={ () => destroyTodo(user) }>Delete</button>
             </li>)
         }
         </ul>

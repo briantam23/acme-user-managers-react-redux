@@ -11,7 +11,7 @@ export default class extends Component {
         this.save = this.save.bind(this);
         if(this.props.id) this.fetchUser(this.props.id);
     }
-    componentDidUpdate (prevProps) {
+    componentDidUpdate(prevProps) {
         if(this.props.id && prevProps.id !== this.props.id) {
             this.fetchUser(this.props.id)
         }
@@ -19,11 +19,11 @@ export default class extends Component {
             this.setState({ name: '' })
         }
     }
-    fetchUser (id) {
+    fetchUser(id) {
         this.props.fetchUser(id)
             .then(user => this.setState({ name: user.name }))
     }
-    save (ev) {
+    save(ev) {
         const { history, id } = this.props;
         ev.preventDefault();
         this.props.save({ 
@@ -32,10 +32,10 @@ export default class extends Component {
         }, this.props.history)
             .catch(ex => this.setState({ error: 'ERROR' }))
     }
-    handleChange (ev) {
+    handleChange(ev) {
         this.setState({ name: ev.target.value });
     }
-    render () {
+    render() {
         const { name, error } = this.state;
         const { handleChange, save } = this;
         const { id } = this.props;

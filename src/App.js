@@ -1,80 +1,47 @@
 import React, { Component } from 'react';
-import { HashRouter as Router, Route, Switch } from 'react-router-dom';
+import { HashRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import axios from 'axios';
+import store, { addUsers, deleteUser, addUser } from './store';
 import Nav from './Nav';
 import Users from './Users';
-import UserCreateUpdate from './UserCreateUpdate';
+import UserCreate from './UserCreate';
 
 export default class extends Component {
-    constructor () {
-        super ();
-        this.state = {
-            users: [],
-            managers: []
-        }
-        this.destroyUser = this.destroyUser.bind(this);
-        this.createUser = this.createUser.bind(this);
-        this.updateUser = this.updateUser.bind(this);
-        this.fetchUser = this.fetchUser.bind(this);
+    constructor() {
+        super();
+        this.state = store.getState();
+        this.destroyTodo = this.destroyTodo.bind(this);
+        this.createTodo = this.createTodo.bind(this);
     }
-    componentDidMount () {
-        axios.get('/api/users')
+    componentDidMount() {
+        this.unsubscribe = store.subscribe(() => this.setState(store.getState()));
+        return axios.get('/api/users')
             .then(res => res.data)
-            .then(users => this.setState({ users }));
+            .then(users => store.dispatch(addUsers(users)))
     }
-    destroyUser (user) {
+    componentWillUnmount() {
+        this.unsubscribe();
+    }
+    destroyTodo(user) {
         return axios.delete(`/api/users/${user.id}`)
-            .then(() => this.setState({ 
-                users: this.state.users.filter(_user => _user.id !== user.id )
-            }))
+            .then(() => store.dispatch(deleteUser(user)))
     }
-    createUser (user, history) {
-        return axios.post('/api/users', user)
-            .then(res => res.data)
-            .then(user => this.setState({ users: [...this.state.users, user] }))
-            .then(() => history.push('/users'))
+    createTodo(user) {
+        return axios.post('/api/users')
+            .then(user => store.dispatch(addUser(user)))
     }
-    updateUser (user, history) {
-        return axios.put(`/api/users/${user.id}`, user)
-            .then(res => res.data)
-            .then(user => this.setState({
-                users: this.state.users.map(_user => _user === user ? user : _user )
-            }))
-            .then(() => history.push('/users'))
-    }
-    fetchUser (id) {
-        return axios.get(`/api/users/${id}`)
-            .then(res => res.data)
-    }
-    render () {
+    render() {
         const { users, managers } = this.state;
-        const { destroyUser, createUser, updateUser, fetchUser } = this;
-
-        const renderNav = ({ location }) => {
-            return <Nav users={ users } path={ location.pathname }/>
-        }
-        const renderUsers = () => {
-            return <Users users={ users } destroyUser={ destroyUser }/> 
-        }
-        const renderUserCreate = ({ history }) => {
-            return <UserCreateUpdate save={ createUser } history={ history }/>
-        }
-        const renderUserUpdate = ({ history, match }) => {
-            return <UserCreateUpdate save={ updateUser } history={ history } 
-            id={ match.params.id } fetchUser = { fetchUser }/>
-        }
+        const { destroyTodo, createTodo } = this;
         return (
             <Router>
                 <div>
                     <h1>Acme Users With Managers</h1>
-                    <Route render={ renderNav }/>
-                    <Route path='/users' render={ renderUsers }/>
-                    <Switch>
-                        <Route path='/users/create' render={ renderUserCreate }/>
-                        <Route path='/users/:id' render={ renderUserUpdate }/>
-                    </Switch>
+                    <Nav users={ users } managers={ managers }/>
+                    <Route path='/users' render={ () => <Users users={ users } destroyTodo={ destroyTodo }/> }/>
+                    <Route path='/users/create' render={ () => <UserCreate users={ users } createTodo={ createTodo }/>}/>
                 </div>
             </Router>
-        ) 
+        )
     }
 }
