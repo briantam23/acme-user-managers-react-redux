@@ -4,8 +4,8 @@ export default ({ managers }) => {
     return (
         <ul>
         {
-            managers.map(manager => <li key={ manager.id }>
-                { manager.name }
+            managers.map((manager, idx) => <li key={ idx }>
+                { manager }
             </li>)
         }
         </ul>

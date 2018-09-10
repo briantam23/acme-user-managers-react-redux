@@ -13,8 +13,10 @@ export default class extends Component {
     componentWillUnmount() { this.unsubscribe(); }
     onCreate(ev) {
         ev.preventDefault();
-        console.log(this.state.manager)
-        this.props.createUser({ name: this.state.name, ManagerId: this.state.manager.id })
+        this.props.createUser({ 
+            name: this.state.name, 
+            ManagerId: this.state.manager.id 
+        })
             .then(() => this.props.history.push('/users'));
     }
     handleChange(ev) {
@@ -26,8 +28,7 @@ export default class extends Component {
             .then(manager => store.dispatch(getManager(manager)));
     }
     render() {
-        const { name } = this.state;
-        const { users } = this.props;
+        const { name, users } = this.state;
         const { onCreate, handleChange, handleManagerChange } = this;
         return (
             <form onSubmit={ onCreate }>
