@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import store, { changeName, getManager } from './store';
+import store, { changeName, getManager, getManagerId } from './store';
 
 export default class extends Component {
     constructor(props) {
@@ -21,7 +21,7 @@ export default class extends Component {
         this.props.updateUser({ 
             id: this.props.id, 
             name: this.state.name,
-            ManagerId: this.state.manager.id
+            ManagerId: this.state.manager ? this.state.manager.id : null
         })
             .then(() => this.props.history.push('/users'));
     }
@@ -35,10 +35,17 @@ export default class extends Component {
     }
     fetchUser(id) {
         this.props.fetchUser(id)
-            .then(user => store.dispatch(changeName(user.name)));
+            .then(user => {
+                store.dispatch(changeName(user.name));
+                if(user.ManagerId) return this.props.fetchUser(user.ManagerId);
+            })
+            .then(manager => {
+                if(manager) store.dispatch(getManagerId(manager.id));
+                else store.dispatch(getManagerId(null));
+            })
     }
     render() {
-        const { name, users } = this.state;
+        const { name, users, managerId } = this.state;
         const { onUpdate, handleChange, handleManagerChange } = this;
         const { managers, id } = this.props;
         return (
@@ -48,7 +55,7 @@ export default class extends Component {
                     <option value=''>--none--</option>
                 {
                     users.map(user => <option key={ user.id } value={ user.id }
-                    /* selected={ managers.Id === user.ManagerId ? 'selected' : null } */>
+                    selected={ managerId === user.id ? 'selected' : null }>
                         { user.name }
                     </option>)
                 }
